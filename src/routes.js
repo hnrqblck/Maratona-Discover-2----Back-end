@@ -34,7 +34,7 @@ routes.get('/', (req, res) => res.render(views + "index", { jobs })); // funçã
 routes.get('/job', (req, res) => res.render(views + "job"));
 routes.post('/job', (req, res) => {
     //req.body = { name: 'henrique', 'daily-hours': '5', 'total-hours': '55' }
-    const lastId= jobs[jobs.length - 1]?.id || 1; // if [jobs.length - 1] = -1 (erro) goes to '1'.
+    const lastId= jobs[jobs.length - 1]?.id || 1; // if [jobs.length - 1] = -1 (error) goes to '1'.
 
     jobs.push({
         id: lastId + 1,
