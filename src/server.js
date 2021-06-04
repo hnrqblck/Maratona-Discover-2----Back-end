@@ -2,6 +2,7 @@ const express = require("express");
 const server = express(); // pesquisar o motivo de ter que fazer duas consts
 const routes = require("./routes"); // ao se ligar ao module.exports no arquivo "routes.js" o require lança o arquivo para a const routes
 
+// usando template engine
 server.set('view engine' , 'ejs');
 
 //habilitar arquivos statics

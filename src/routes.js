@@ -9,7 +9,8 @@ const profile = {
     "monthly-budget": 3000, //em nome e avatar não foi necessário escrever entre aspas por serem palavras sós, mas para monthly-budget é importante
     "days-per-week": 5,
     "hours-per-day": 5,
-    "vacation-per-year": 4
+    "vacation-per-year": 4,
+    "value-hour": 75
 };
 
 const jobs = [
@@ -18,19 +19,93 @@ const jobs = [
         name: "Pizzaria Guloso",
         "daily-hours": 2,
         "total-hours": 60,
-        created_at: Date.now()
+        created_at: Date.now(),
     },
     {
         id: 2,
         name: "OneTwo Project",
         "daily-hours": 3,
         "total-hours": 47,
-        created_at: Date.now()
+        created_at: Date.now(),
     }
 ];
 
+
+
+
+
+
+function remainingDays(job) {
+    // calculo de tempo restante
+    const remainingDays = job["total-hours"] / job['daily-hours'].toFixed();
+
+    const createdDate = new Date(job.created_at)
+    const dueDay = createdDate.getDate() + Number(remainingDays);
+    const dueDateInMs = createdDate.setDate(dueDay);
+    
+    const timeDiffInMs = dueDateInMs - Date.now();
+    // transformar milli em dias
+    const dayInMs = 1000 * 60 * 60 * 24;
+    const dayDiff = Math.floor(timeDiffInMs / dayInMs)
+
+    return dayDiff;
+}
+
+
+
+
+
+
+
 //request, response
-routes.get('/', (req, res) => res.render(views + "index", { jobs })); // função curta "arrow function"
+routes.get('/', (req, res) => {
+
+    const updatedJobs = jobs.map(job => {
+        // ajustes no job
+        const remaining = remainingDays(job);
+        const status = remaining <= 0 ? 'done' : 'progress'
+
+        return {
+            ...job,
+            remaining,
+            status,
+            budget: profile["value-hour"] * job["total-hours"]
+        };
+    });
+    
+    
+
+
+
+
+
+
+
+
+
+
+
+    return res.render(views + "index", { jobs: updatedJobs })
+
+}); 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 routes.get('/job', (req, res) => res.render(views + "job"));
 routes.post('/job', (req, res) => {
     //req.body = { name: 'henrique', 'daily-hours': '5', 'total-hours': '55' }
