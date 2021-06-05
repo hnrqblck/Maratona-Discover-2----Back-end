@@ -114,13 +114,45 @@ const Job = {
             job.budget = Job.services.calculateBudget(job, Profile.data["value-hour"]);
 
             return res.render(views + "job-edit", { job });
+        },
+
+        update(req, res) {
+            const jobId = req.params.id;
+            const job = Job.data.find(job => Number(job.id) === Number(jobId)); // Quando o find acha um objeto verdadeiro ele pega o objeto do momento e coloca onde quero colocar, nesse caso na constante 'job'
+
+            if(!job) {
+                return res.send('Job not found!');
+            }
+
+            const updatedJob = {
+                ...job, 
+                name: req.body.name,
+                "total-hours": req.body["total-hours"],
+                "daily-hours": req.body["daily-hours"],
+            }
+
+            Job.data = Job.data.map(job => {
+                if(Number(job.id) === Number(jobId)) job = updatedJob;
+
+                return job;
+            })
+            
+            res.redirect('/job/' + jobId);
+        },
+
+        delete(req, res) {
+            const jobId = req.params.id;
+
+            Job.data = Job.data.filter(job => Number(job.id) !== Number(jobId));
+
+            return res.redirect('/');
         }
     },
 
     services: {
         remainingDays(job) {
             // calculo de tempo restante
-            const remainingDays = job["total-hours"] / job['daily-hours'].toFixed();
+            const remainingDays = job["total-hours"] / Math.round(job['daily-hours']);
         
             const createdDate = new Date(job.created_at)
             const dueDay = createdDate.getDate() + Number(remainingDays);
@@ -143,6 +175,8 @@ routes.get('/', Job.controllers.index);
 routes.get('/job', Job.controllers.create);
 routes.post('/job', Job.controllers.save);
 routes.get('/job/:id', Job.controllers.show);
+routes.post('/job/:id', Job.controllers.update);
+routes.post('/job/delete/:id', Job.controllers.delete);
 routes.get('/profile', Profile.controllers.index);
 routes.post('/profile', Profile.controllers.update);
 
