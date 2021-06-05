@@ -7,9 +7,9 @@ const Profile = {
     data: {
         name: "Gita",
         avatar: "https://github.com/hnrqblck.png",
-        "monthly-budget": 3000, //em nome e avatar não foi necessário escrever entre aspas por serem palavras sós, mas para monthly-budget é importante
+        "monthly-budget": 3500, //em nome e avatar não foi necessário escrever entre aspas por serem palavras sós, mas para monthly-budget é importante
         "days-per-week": 5,
-        "hours-per-day": 5,
+        "hours-per-day": 7,
         "vacation-per-year": 4,
         "value-hour": 75
     },
@@ -77,7 +77,7 @@ const Job = {
                     ...job,
                     remaining,
                     status,
-                    budget: Profile.data["value-hour"] * job["total-hours"]
+                    budget: Job.services.calculateBudget(job, Profile.data["value-hour"])
                 };
             });
             
@@ -100,6 +100,20 @@ const Job = {
                 created_at: Date.now() //atribuindo data de hoje
             });
             return res.redirect('/');
+        },
+
+        show(req, res) {
+
+            const jobId = req.params.id;
+            const job = Job.data.find(job => Number(job.id) === Number(jobId)); // Quando o find acha um objeto verdadeiro ele pega o objeto do momento e coloca onde quero colocar, nesse caso na constante 'job'
+
+            if(!job) {
+                return res.send('Job not found!');
+            }
+
+            job.budget = Job.services.calculateBudget(job, Profile.data["value-hour"]);
+
+            return res.render(views + "job-edit", { job });
         }
     },
 
@@ -118,7 +132,9 @@ const Job = {
             const dayDiff = Math.floor(timeDiffInMs / dayInMs)
         
             return dayDiff;
-        }
+        },
+
+        calculateBudget: (job, valueHour) => valueHour * job["total-hours"],
     }
 }
 
@@ -126,7 +142,7 @@ const Job = {
 routes.get('/', Job.controllers.index);
 routes.get('/job', Job.controllers.create);
 routes.post('/job', Job.controllers.save);
-routes.get('/job/edit', (req, res) => res.render(views + "job-edit"));
+routes.get('/job/:id', Job.controllers.show);
 routes.get('/profile', Profile.controllers.index);
 routes.post('/profile', Profile.controllers.update);
 
