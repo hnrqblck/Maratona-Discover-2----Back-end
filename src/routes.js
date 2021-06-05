@@ -90,7 +90,7 @@ const Job = {
 
         save(req, res) {
             //req.body = { name: 'henrique', 'daily-hours': '5', 'total-hours': '55' }
-            const lastId= Job.data[Job.data.length - 1]?.id || 1; // if [jobs.length - 1] = -1 (error) goes to '1'.
+            const lastId= Job.data[Job.data.length - 1]?.id || 0; // if [jobs.length - 1] = -1 (error) goes to '1'.
 
             Job.data.push({
                 id: lastId + 1,
